@@ -51,10 +51,9 @@ const unsigned char circle[] PROGMEM = {
 
 int gameBoard[6][7];
 int playerTurn = 1;
-int numTurns = 0;
 int lastSlotX = 0;
 int lastSlotY = 0;
-int chainLength = 0;
+int chainLength = 1;
 int winner = 0;
 int currentSlot = 0;
 int lastSlot = -1;
@@ -104,7 +103,7 @@ void loop()
         if(startUI)
         {
           tft.fillRect(23,17,120,18,ST77XX_BLACK);
-          tft.fillRect(50,3,50,9,ST77XX_BLACK);
+          tft.fillRect(20,3,130,8,ST77XX_BLACK);
           drawBorder(playerTurn);
           tft.setCursor(50,3);
           tft.write("Player 1! ");
@@ -137,6 +136,11 @@ void loop()
           Serial.println("drop req");
           dropPiece();
         }
+
+        if(winner != 0)
+        {
+          break;
+        }
         delay(100);
       }
       else if(playerTurn == 2)
@@ -144,7 +148,7 @@ void loop()
         if(startUI)
         {
           tft.fillRect(23,17,120,18,ST77XX_BLACK);
-          tft.fillRect(50,3,50,9,ST77XX_BLACK);
+          tft.fillRect(20,3,130,8,ST77XX_BLACK);
           drawBorder(playerTurn);
           tft.setCursor(50,3);
           tft.write("Player 2!");
@@ -175,6 +179,11 @@ void loop()
         if(digitalRead(MIDDLEBUTTON) == LOW)
         {
           dropPiece();
+        }
+
+        if(winner != 0)
+        {
+          break;
         }
         delay(100);
       }
@@ -242,6 +251,11 @@ void dropPiece()
       {
         tft.drawBitmap(xCoord,yCoord,circle,15,15,ST77XX_RED);
         gameBoard[i][currentSlot] = 1;
+
+        lastSlotX = currentSlot;
+        lastSlotY = i;
+        checkWin();
+
         playerTurn = 2;
         startUI = true;
         lastSlot = -1;
@@ -252,6 +266,11 @@ void dropPiece()
       {
         tft.drawBitmap(xCoord,yCoord,circle,15,15,ST77XX_YELLOW);
         gameBoard[i][currentSlot] = 2;
+
+        lastSlotX = currentSlot;
+        lastSlotY = i;
+        checkWin();
+
         playerTurn = 1;
         startUI = true;
         lastSlot = -1;
@@ -261,12 +280,50 @@ void dropPiece()
     }
     else if(gameBoard[0][currentSlot] == 1 || gameBoard[0][currentSlot] == 2)
     {
-      
+      tft.fillRect(15,3,125,15,ST77XX_BLACK);
+      tft.setCursor(25,3);
+      tft.write("Pick another slot!");
+      break;
     }
   }
 }
 
+void checkWin()
+{
+  //check up
+  for(int i = lastSlotY-1; i >= 0; i--)
+  {
+    if(gameBoard[i][lastSlotX] == playerTurn)
+    {
+      chainLength++;
+    }
+  }
 
+  if(chainLength >= 4)
+  {
+    winner = playerTurn;
+  }
 
+  chainLength = 1;
+  //check down
 
+  for(int i = lastSlotY + 1; i < 5; i++)
+  {
+    if(gameBoard[i][lastSlotX] == playerTurn)
+    {
+      chainLength++;
+    }
+  }
+
+  if(chainLength >= 4)
+  {
+    winner = playerTurn;
+  }
+  //check left
+
+  //check right
+  //check diag one
+  //check diag two
+  
+}
 
