@@ -33,19 +33,19 @@ const unsigned char arrow[] PROGMEM = {
 
 const unsigned char circle[] PROGMEM = {
   0x00, 0x00, 
-  0x07, 0xc0, 
-  0x1f, 0xf0, 
-  0x3f, 0xf8, 
-  0x3f, 0xf8, 
-  0x7f, 0xfc, 
-  0x7f, 0xfc, 
-  0x7f, 0xfc, 
-  0x7f, 0xfc, 
-  0x7f, 0xfc, 
-  0x3f, 0xf8, 
-  0x3f, 0xf8, 
-  0x1f, 0xf0, 
-  0x07, 0xc0, 
+  0x00, 0x00, 
+  0x00, 0x00, 
+  0x07, 0x80, 
+  0x1f, 0xe0, 
+  0x1f, 0xe0, 
+  0x3f, 0xf0, 
+  0x3f, 0xf0, 
+  0x3f, 0xf0, 
+  0x3f, 0xf0, 
+  0x1f, 0xe0, 
+  0x1f, 0xe0, 
+  0x07, 0x80, 
+  0x00, 0x00, 
   0x00, 0x00
 };
 
@@ -103,6 +103,8 @@ void loop()
       {
         if(startUI)
         {
+          tft.fillRect(23,17,120,18,ST77XX_BLACK);
+          tft.fillRect(50,3,50,9,ST77XX_BLACK);
           drawBorder(playerTurn);
           tft.setCursor(50,3);
           tft.write("Player 1! ");
@@ -135,11 +137,46 @@ void loop()
           Serial.println("drop req");
           dropPiece();
         }
-        delay(200);
+        delay(100);
       }
       else if(playerTurn == 2)
       {
-        
+        if(startUI)
+        {
+          tft.fillRect(23,17,120,18,ST77XX_BLACK);
+          tft.fillRect(50,3,50,9,ST77XX_BLACK);
+          drawBorder(playerTurn);
+          tft.setCursor(50,3);
+          tft.write("Player 2!");
+          tft.setCursor(15,10);
+          tft.write("Please select a slot: ");
+          startUI = false;
+          currentSlot = 0;
+          drawArrow();
+        }
+        if(digitalRead(RIGHTBUTTON) == LOW)
+        {
+          if(currentSlot < 6)
+          {
+            currentSlot++;
+            drawArrow();
+          }
+        }
+
+        if(digitalRead(LEFTBUTTON) == LOW)
+        {
+          if(currentSlot > 0)
+          {
+            currentSlot--;
+            drawArrow();
+          }
+        }
+
+        if(digitalRead(MIDDLEBUTTON) == LOW)
+        {
+          dropPiece();
+        }
+        delay(100);
       }
     }
   }
@@ -196,7 +233,7 @@ void dropPiece()
     if(gameBoard[i][currentSlot] == 0)
     {
       int xCoord = 26 + (currentSlot * 15);
-      int yCoord = 36 + (i * 36);
+      int yCoord = 35 + (i * 15);
       Serial.print("X coord ");
       Serial.println(xCoord);
       Serial.print("Y coord ");
@@ -204,11 +241,22 @@ void dropPiece()
       if(playerTurn == 1)
       {
         tft.drawBitmap(xCoord,yCoord,circle,15,15,ST77XX_RED);
+        gameBoard[i][currentSlot] = 1;
+        playerTurn = 2;
+        startUI = true;
+        lastSlot = -1;
+        currentSlot = 1;
         break;
       }
       else if(playerTurn == 2)
       {
-        tft.drawBitmap(xCoord,yCoord,circle,18,18,ST77XX_YELLOW);
+        tft.drawBitmap(xCoord,yCoord,circle,15,15,ST77XX_YELLOW);
+        gameBoard[i][currentSlot] = 2;
+        playerTurn = 1;
+        startUI = true;
+        lastSlot = -1;
+        currentSlot = 1;
+        break;
       }
     }
     else if(gameBoard[0][currentSlot] == 1 || gameBoard[0][currentSlot] == 2)
@@ -217,3 +265,8 @@ void dropPiece()
     }
   }
 }
+
+
+
+
+
