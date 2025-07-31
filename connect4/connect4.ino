@@ -302,6 +302,76 @@ void dropPiece()
   }
 }
 
+void checkPieces()
+{
+  for(int i = 5; i >= 0; i--)
+  {
+    if(gameBoard[i][currentSlot] == 0)
+    {
+      int xCoord = 26 + (currentSlot * 15);
+      int yCoord = 35 + (i * 15);
+      if(playerTurn == 1)
+      {
+        tft.drawBitmap(xCoord,yCoord,circle,15,15,ST77XX_RED);
+        gameBoard[i][currentSlot] = 1;
+
+        lastSlotX = currentSlot;
+        lastSlotY = i;
+        checkWin();
+
+        playerTurn = 2;
+        startUI = true;
+        lastSlot = -1;
+        currentSlot = 1;
+        break;
+      }
+      else if(playerTurn == 2)
+      {
+        tft.drawBitmap(xCoord,yCoord,circle,15,15,ST77XX_YELLOW);
+        gameBoard[i][currentSlot] = 2;
+
+        lastSlotX = currentSlot;
+        lastSlotY = i;
+        checkWin();
+
+        playerTurn = 1;
+        startUI = true;
+        lastSlot = -1;
+        currentSlot = 1;
+        break;
+      }
+    }
+    else if(gameBoard[0][currentSlot] == 1 || gameBoard[0][currentSlot] == 2)
+    {
+      tft.fillRect(15,3,125,15,ST77XX_BLACK);
+      tft.setCursor(25,3);
+      tft.write("Pick another slot!");
+      break;
+    }
+
+    Serial.println("---------------------------------");
+    //check up
+    // debug these 
+    for(int i = lastSlotY-1; i >= 0; i--)
+    {
+      if(gameBoard[i][lastSlotX] == playerTurn)
+      {
+        chainLength++;
+      }
+    }
+    Serial.print("Up chain length: ");
+    Serial.println(chainLength);
+    if(chainLength >= 4)
+    {
+      winner = playerTurn;
+      Serial.println("Win detected!");
+    }
+
+    chainLength = 1;
+    //check down
+  }
+}
+
 void checkWin()
 {
   Serial.println("---------------------------------");
