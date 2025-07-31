@@ -188,6 +188,26 @@ void loop()
         delay(100);
       }
     }
+
+    if(winner == 1)
+    {
+      tft.fillScreen(ST77XX_BLACK);
+      tft.write("PLAYER 1 WINS!");
+      tft.drawRect(0,0,160,128,ST77XX_RED);
+      tft.drawRect(1,1,158,126,ST77XX_RED);
+      // add delay
+    }
+    else if(winner == 2)
+    {
+      tft.fillScreen(ST77XX_BLACK);
+      tft.write("PLAYER 2 WINS!");
+      tft.drawRect(0,0,160,128,ST77XX_YELLOW);
+      tft.drawRect(1,1,158,126,ST77XX_YELLOW);
+      // add delay
+    }
+
+    // create play again screen
+
   }
 }
 
@@ -291,6 +311,7 @@ void dropPiece()
 void checkWin()
 {
   //check up
+  // debug these 
   for(int i = lastSlotY-1; i >= 0; i--)
   {
     if(gameBoard[i][lastSlotX] == playerTurn)
@@ -302,6 +323,7 @@ void checkWin()
   if(chainLength >= 4)
   {
     winner = playerTurn;
+    Serial.println("Win detected!");
   }
 
   chainLength = 1;
@@ -318,12 +340,48 @@ void checkWin()
   if(chainLength >= 4)
   {
     winner = playerTurn;
+    Serial.println("Win detected!");
   }
-  //check left
 
+  chainLength = 1;
+  //check left
+  // omg this is making me crash out
+  for(int i = lastSlotX - 1; i > 0; i--)
+  {
+    if(gameBoard[lastSlotY][i] == playerTurn)
+    {
+      chainLength++;
+    }
+  }
+
+  if(chainLength >= 4)
+  {
+    winner = playerTurn;
+    Serial.println("Win detected!");
+  }
+
+  chainLength = 1;
   //check right
+
+  for(int i = lastSlotX + 1; i < 6; i++)
+  {
+    if(gameBoard[lastSlotY][i] == playerTurn)
+    {
+      chainLength++;
+    }
+  }
+
+  if(chainLength >= 4)
+  {
+    winner = playerTurn;
+    Serial.println("Win detected!");
+  }
+
+  chainLength = 1;
   //check diag one
   //check diag two
   
 }
+
+
 
