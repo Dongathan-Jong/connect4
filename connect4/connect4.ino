@@ -133,7 +133,6 @@ void loop()
 
         if(digitalRead(MIDDLEBUTTON) == LOW)
         {
-          Serial.println("drop req");
           dropPiece();
         }
 
@@ -256,17 +255,12 @@ void drawArrow()
 
 void dropPiece()
 {
-  Serial.println("In Method");
   for(int i = 5; i >= 0; i--)
   {
     if(gameBoard[i][currentSlot] == 0)
     {
       int xCoord = 26 + (currentSlot * 15);
       int yCoord = 35 + (i * 15);
-      Serial.print("X coord ");
-      Serial.println(xCoord);
-      Serial.print("Y coord ");
-      Serial.println(yCoord);
       if(playerTurn == 1)
       {
         tft.drawBitmap(xCoord,yCoord,circle,15,15,ST77XX_RED);
@@ -310,6 +304,7 @@ void dropPiece()
 
 void checkWin()
 {
+  Serial.println("---------------------------------");
   //check up
   // debug these 
   for(int i = lastSlotY-1; i >= 0; i--)
@@ -319,7 +314,8 @@ void checkWin()
       chainLength++;
     }
   }
-
+  Serial.print("Up chain length: ");
+  Serial.println(chainLength);
   if(chainLength >= 4)
   {
     winner = playerTurn;
@@ -336,7 +332,8 @@ void checkWin()
       chainLength++;
     }
   }
-
+  Serial.print("Down chain length: ");
+  Serial.println(chainLength);
   if(chainLength >= 4)
   {
     winner = playerTurn;
@@ -345,15 +342,16 @@ void checkWin()
 
   chainLength = 1;
   //check left
-  // omg this is making me crash out
-  for(int i = lastSlotX - 1; i > 0; i--)
+  // omg this is making me crash out WHY IS THIS THE ONLY ONE THAT DOESNT WRK WTASDFOIAHSEGFOIASJEGIO
+  for(int i = lastSlotX - 1; i >= 0; i--)
   {
     if(gameBoard[lastSlotY][i] == playerTurn)
     {
       chainLength++;
     }
   }
-
+  Serial.print("Left chain length: ");
+  Serial.println(chainLength);
   if(chainLength >= 4)
   {
     winner = playerTurn;
@@ -370,7 +368,8 @@ void checkWin()
       chainLength++;
     }
   }
-
+  Serial.print("Right chain length: ");
+  Serial.println(chainLength);
   if(chainLength >= 4)
   {
     winner = playerTurn;
@@ -379,9 +378,43 @@ void checkWin()
 
   chainLength = 1;
   //check diag one
-  //check diag two
-  
-}
+  //up left
+  int x = lastSlotX - 1;
+  int y = lastSlotY - 1;
 
+  while(x >= 0 && y>= 0 && gameBoard[y][x] == playerTurn)
+  {
+    chainLength++;
+    x--;
+    y--;
+  }
+
+  // down right LAIEJDFHOLKASEJGFIOASJFGOIJSDOFGASDOFAOSIJF
+
+  x = lastSlotX + 1;
+  y = lastSlotY + 1;
+
+  while(x < 7 && y < 6 && gameBoard[y][x] == playerTurn)
+  {
+    chainLength++;
+    x++;
+    y++;
+  }
+
+  Serial.print("Diagonal \ chain length: ");
+  Serial.println(chainLength);
+
+  if(chainLength >= 4)
+  {
+    winner = playerTurn;
+    Serial.println("Win detected!");
+  }
+
+ 
+  //check diag two
+
+
+
+}
 
 
